@@ -10,9 +10,30 @@ from bs4 import BeautifulSoup
 import os
 from pprint import pprint
 import re
-from InstagramAPI import InstagramAPI
+import sys
+#from InstagramAPI import InstagramAPI
+import json
 
-url = "https://www.instagram.com/eggycouple"
+master = "insta_map.json"
+
+def export_json(fn, data):
+    with open(fn, 'w', encoding='utf-8') as outfile:
+        json.dump(data, outfile, indent=3)
+    print("[Exported]: {}".format(fn))
+
+def load_json(fn):
+    with open(fn) as f:
+        data = json.load(f)
+    print("[Imported]: {}".format(fn))
+    return data
+
+
+if not(os.path.isfile(master)):
+    export_json(master, {})
+
+
+target = sys.argv[1]
+url = "https://www.instagram.com/{}".format(target)
 acc = 1
 browser = webdriver.Chrome()
 browser.get(url)
@@ -83,13 +104,33 @@ def get_all_id(lst_url):
     acc = 1
     for x in lst_url:
         browser.get(x)
-        id = get_html_source(browser.page_source, x)
+        try:
+            id = get_html_source(browser.page_source, x)
+        except:
+            print("Error at: {}".format(x))
+            id = None
         lst_id.append(id)
         acc += 1
     return lst_id
 
 id_lst = get_all_id(lst_url)
+lst_url = list(map(lambda x: get_shortcode(x), lst_url))
+diczip = dict(zip(lst_url, id_lst))
 
+
+
+master_dic = load_json(master)
+
+if target not in master_dic:
+    master_dic[target] = diczip
+else:
+    tempval = master_dic[target].copy()
+    tempval.update(diczip)
+    master_dic[target] = tempval
+
+export_json(master, master_dic)
+
+"""
 api = InstagramAPI("", "")
 api.login()
 
@@ -97,3 +138,4 @@ for x in id_lst:
     api.mediaInfo(x)
     info = api.LastJson
     print(info)
+"""
