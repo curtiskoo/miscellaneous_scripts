@@ -3,9 +3,12 @@ import tarfile
 import os
 from shutil import copyfile, move, rmtree
 import shutil
+import sys
+
 sd = '1solutions'
-fn = 'pset-03-103_Curtis_17.tar.gz'
-parent_folder = fn[:fn.find('-', fn.find('-')+1)]
+print(sys.argv)
+#fn = 'pset-03-103_Curtis_17.tar.gz'
+#parent_folder = fn[:fn.find('-', fn.find('-')+1)]
 def extract_tarball(fname):
     if (fname.endswith("tar.gz")):
         tar = tarfile.open(fname, "r:gz")
@@ -82,13 +85,15 @@ def package_zip(d):
     shutil.make_archive(fn, 'zip', d)  
     print("Packaged: {}".format('{}.zip'.format(fn)))
     
-    
-owd = os.getcwd()
-try:
-    unpack_110('pset-03')
-except:
-    os.chdir(owd)
-    raise
-
-package_zip('pset-03')
+fn = sys.argv[1]
+if len(sys.argv) == 2:
+    owd = os.getcwd()
+    try:
+        unpack_110(fn)
+    except:
+        os.chdir(owd)
+        raise
+elif len(sys.argv) > 2:
+    #print('hello')
+    package_zip(fn)
 
