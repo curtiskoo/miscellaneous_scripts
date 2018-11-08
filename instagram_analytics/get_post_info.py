@@ -31,15 +31,21 @@ def load_json(fn):
 if not(os.path.isfile(master)):
     export_json(master, {})
 
+master_dic = load_json(master)
 
 target = sys.argv[1]
 url = "https://www.instagram.com/{}".format(target)
 acc = 1
-browser = webdriver.Chrome()
+browser = webdriver.Chrome("/Users/curtiskoo/Desktop/python1/chromedriver")
 browser.get(url)
 elems = browser.find_elements_by_xpath("//*[@class='eLAPa']")
 elems[0].click()
 
+existing_keys = []
+if target in master_dic:
+    existing_keys = list(master_dic[target].keys())
+
+print("Existing Records: {}".format(len(existing_keys))) #comment out
 
 def key_right(browser):
     actions = ActionChains(browser)
@@ -76,19 +82,38 @@ def get_html_source(html, b=None):
     #print(post_id)
     return post_id
 
-
+prev = None
 def get_url_lst():
+    global prev
     lst_url = []
     right_button = "//a[@class='HBoOv coreSpriteRightPaginationArrow']"
     while True:
         try:
-            elem = WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, right_button)))
-            if browser.current_url not in lst_url:
+            rb = WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, right_button)))
+            time.sleep(1)
+            elem = browser.find_element_by_xpath('//a[@class="c-Yi7"]')
+            sc = elem.get_attribute('href')
+            #print(sc)
+            #print(prev)
+            #while prev == sc:
+            #    if browser.current_url not in lst_url and browser.current_url not in existing_keys:
+            #        lst_url.append(browser.current_url)
+            #    key_right(browser)
+            #    #lst_url.append(browser.current_url)
+            #    pass
+            #print("{} | {}".format(get_shortcode(browser.current_url), get_shortcode(sc)))
+            if browser.current_url not in lst_url and get_shortcode(browser.current_url) not in existing_keys:
                 lst_url.append(browser.current_url)
+            #print(prev, browser.current_url)
             # browser.refresh()
             # html = browser.page_source
             # soup = get_html_source(html)
-            key_right(browser)
+            #prev = browser.current_url
+            #key_right(browser)
+            if prev != len(lst_url):
+                prev = len(lst_url)
+                print(len(lst_url))
+            rb.click()
             # acc += 1
         except TimeoutException:
             print("Done")
@@ -118,8 +143,6 @@ lst_url = list(map(lambda x: get_shortcode(x), lst_url))
 diczip = dict(zip(lst_url, id_lst))
 
 
-
-master_dic = load_json(master)
 
 if target not in master_dic:
     master_dic[target] = diczip
