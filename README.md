@@ -2,6 +2,14 @@
 
 This repo is for me to develop one-time scripts that allow to speed up daily routines. <br />
 
+## crypto_scripts
+
+Scripts used for checking and creating crypto price quotes using Kraken and QuadrigaCX API
+
+## data_parsing_poc
+
+Scripts related to parsing miscellaneous data (i.e. Excel cell translation)
+
 ## grading_tools
 
 Scripts used for CPSC 110 grading <br />
@@ -15,6 +23,3 @@ Proof of concept for scraping user posts information from instagram <br />
 ## ssc_automation
 
 Scripts related to SSC (i.e. course registration, switching, checking)
-
-
-
